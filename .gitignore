@@ -2,3 +2,6 @@
 .venv
 
 __pycache__
+
+# Where the image archives are saved
+cached_data

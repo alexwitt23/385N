@@ -18,4 +18,8 @@ flask run
 
 # API
 
+```
+curl http://127.0.0.1:5000/calculate-reward?archive=test_data_living_room.tar.zst
+```
+
 
