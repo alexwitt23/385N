@@ -81,5 +81,4 @@ contract rewardMultiResolution is Ownable{
 
         return total_reward;
     }
-
 }
