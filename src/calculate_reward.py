@@ -2,14 +2,14 @@ import h3
 import math
 import random
 
-
 # TODO:
 # Check for underflow and overflow
 # Does not handle out of bounds in H3Geo.
 # When the remaining tokens gets below the lowest denomination, then don't mint.
 
-class rewardSingleResolution:
-    r"""Class maintain the lookup for the reward at each cell for the given resolution.
+
+class RewardSingleResolution:
+    """Class maintain the lookup for the reward at each cell for the given resolution.
 
     Assumes Quality is between 0 and 1.
 
@@ -39,9 +39,11 @@ class rewardSingleResolution:
         self.max_tokens_per_cell = max_tokens_per_cell
         self.max_first_image_value = max_first_image_value
 
-        self.num_image = {} # Maintains a mapping from id to number of image
-        self.next_reward = {} # Maintains a mapping from id to number of tokens for next images
-        self.remaining_total = {} # Maintains a mapping from id to remaining tokens for the current cell
+        self.num_image = {}  # Maintains a mapping from id to number of image
+        self.next_reward = {
+        }  # Maintains a mapping from id to number of tokens for next images
+        self.remaining_total = {
+        }  # Maintains a mapping from id to remaining tokens for the current cell
 
     def calculate_reward(self, latitude, longitude, quality):
         """
@@ -77,30 +79,36 @@ class rewardSingleResolution:
             self.num_image[hex_id] = 0
             self.next_reward[hex_id] = self.max_first_image_value
             self.remaining_total[hex_id] = self.max_tokens_per_cell
-        
+
         quality_weighted_reward = quality * self.next_reward[hex_id]
 
         self.num_image[hex_id] += 1
         t = self.remaining_total[hex_id]
         b = self.next_reward[hex_id]
         self.remaining_total[hex_id] -= quality_weighted_reward
-        self.next_reward[hex_id] = (self.remaining_total[hex_id] * b)/t
+        self.next_reward[hex_id] = (self.remaining_total[hex_id] * b) / t
 
-        return quality_weighted_reward, self.remaining_total[hex_id], self.next_reward[hex_id], hex_id
+        return quality_weighted_reward, self.remaining_total[
+            hex_id], self.next_reward[hex_id], hex_id
 
-class rewardMultiLevel:
+
+class RewardMultiLevel:
     def __init__(self):
         self.reward_params_track = {}
 
-    def __add_resolution_rewards__(self, resolution, max_tokens_per_hex, max_first_image_value):
+    def __add_resolution_rewards__(self, resolution, max_tokens_per_hex,
+                                   max_first_image_value):
         assert resolution not in self.reward_params_track, "Reward at this resolution already defined"
-        self.reward_params_track[resolution] = rewardSingleResolution(resolution, max_tokens_per_cell, max_first_image_value)
+        self.reward_params_track[resolution] = RewardSingleResolution(
+            resolution, max_tokens_per_cell, max_first_image_value)
 
     def compute_multilevel_rewards(self, latitude, longitude, quality):
         reward_sum = 0
         for single_reward in self.reward_params_track.values():
-            reward_sum += single_reward.calculate_reward(latitude, longitude, quality)[0]
+            reward_sum += single_reward.calculate_reward(
+                latitude, longitude, quality)[0]
         return reward_sum
+
 
 if __name__ == "__main__":
     fixed_x, fixed_y, fixed_reso = 100.0111101, 101.1010110, 10
@@ -114,18 +122,24 @@ if __name__ == "__main__":
         print(f"\n\n============== Quality {quality} ==============")
 
         for first_token in [0.5, 1, 3, 9]:
-            print(f"\nTesting distribution for {fixed_reso}-resolution cell: {h3.geo_to_h3(fixed_x, fixed_y, fixed_reso)} with max {max_tokens_per_cell} token and {first_token} start tokens.")
+            print(
+                f"\nTesting distribution for {fixed_reso}-resolution cell: {h3.geo_to_h3(fixed_x, fixed_y, fixed_reso)} with max {max_tokens_per_cell} token and {first_token} start tokens."
+            )
             print_at = [0, 1, 2, 3, 4, 5, 10, 20, 100, 500]
 
-            rewardFn = rewardSingleResolution(fixed_reso, max_tokens_per_cell, first_token)
+            rewardFn = RewardSingleResolution(fixed_reso, max_tokens_per_cell,
+                                              first_token)
             reward_sum = 0
 
-            max_iters = 1000 # Assume 1000 images for now.
+            max_iters = 1000  # Assume 1000 images for now.
             for i in range(max_iters):
-                reward, remaining_total, next_max_reward, _ = rewardFn.calculate_reward(fixed_x, fixed_y, quality)
+                reward, remaining_total, next_max_reward, _ = rewardFn.calculate_reward(
+                    fixed_x, fixed_y, quality)
                 reward_sum += reward
                 if i in print_at:
-                    print(f"Reward at {i}th iter: {reward} at quality={quality} with {remaining_total} remaining tokens and {next_max_reward} next reward.")
+                    print(
+                        f"Reward at {i}th iter: {reward} at quality={quality} with {remaining_total} remaining tokens and {next_max_reward} next reward."
+                    )
 
             print(f"Cummulative reward after {max_iters} is {reward_sum}")
 
@@ -133,19 +147,25 @@ if __name__ == "__main__":
     print("========= Runs for Quality ~ U[0, 1]: ==========")
     print("=====================================================")
     for first_token in [0.5, 1, 3, 9]:
-        print(f"\n\nTesting distribution for {fixed_reso}-resolution cell: {h3.geo_to_h3(fixed_x, fixed_y, fixed_reso)} with max {max_tokens_per_cell} token and {first_token} start tokens.")
+        print(
+            f"\n\nTesting distribution for {fixed_reso}-resolution cell: {h3.geo_to_h3(fixed_x, fixed_y, fixed_reso)} with max {max_tokens_per_cell} token and {first_token} start tokens."
+        )
         print_at = [0, 1, 2, 3, 4, 5, 10, 20, 100, 500]
 
-        rewardFn = rewardSingleResolution(fixed_reso, max_tokens_per_cell, first_token)
+        rewardFn = RewardSingleResolution(fixed_reso, max_tokens_per_cell,
+                                          first_token)
         reward_sum = 0
 
-        max_iters = 1000 # Assume 1000 images for now.
+        max_iters = 1000  # Assume 1000 images for now.
         for i in range(max_iters):
             quality = round(random.uniform(0.0000001, 1), 6)
-            reward, remaining_total, next_max_reward, _ = rewardFn.calculate_reward(fixed_x, fixed_y, quality)
+            reward, remaining_total, next_max_reward, _ = rewardFn.calculate_reward(
+                fixed_x, fixed_y, quality)
             reward_sum += reward
             if i in print_at:
-                print(f"Reward at {i}th iter: {reward} at quality={quality} with {remaining_total} remaining tokens and {next_max_reward} next reward.")
+                print(
+                    f"Reward at {i}th iter: {reward} at quality={quality} with {remaining_total} remaining tokens and {next_max_reward} next reward."
+                )
 
         print(f"Cummulative reward after {max_iters} is {reward_sum}")
 
@@ -153,43 +173,60 @@ if __name__ == "__main__":
     print("==== Runs for two hexIDs with Quality ~ U[0.5, 1]: ====")
     print("=======================================================")
     for first_token in [0.5, 1, 3]:
-        print(f"\n\nTesting distribution for {fixed_reso}-resolution cell: {h3.geo_to_h3(fixed_x, fixed_y, fixed_reso)} with max {max_tokens_per_cell} token and {first_token} start tokens.")
+        print(
+            f"\n\nTesting distribution for {fixed_reso}-resolution cell: {h3.geo_to_h3(fixed_x, fixed_y, fixed_reso)} with max {max_tokens_per_cell} token and {first_token} start tokens."
+        )
         print_at = [0, 1, 2, 3, 4, 5, 10, 20, 100, 500]
 
-        rewardFn = rewardSingleResolution(fixed_reso, max_tokens_per_cell, first_token)
+        rewardFn = RewardSingleResolution(fixed_reso, max_tokens_per_cell,
+                                          first_token)
         reward_sum1 = 0
         reward_sum2 = 0
 
-        max_iters = 1000 # Assume 1000 images for now.
+        max_iters = 1000  # Assume 1000 images for now.
         for i in range(max_iters):
             quality = round(random.uniform(0.5, 1), 6)
-            reward, remaining_total, next_max_reward, hexID1 = rewardFn.calculate_reward(fixed_x, fixed_y, quality)
+            reward, remaining_total, next_max_reward, hexID1 = rewardFn.calculate_reward(
+                fixed_x, fixed_y, quality)
             reward_sum1 += reward
             if i in print_at:
-                print(f"Reward for {hexID1} at {i}th iter: {reward} at quality={quality} with {remaining_total} remaining.")
+                print(
+                    f"Reward for {hexID1} at {i}th iter: {reward} at quality={quality} with {remaining_total} remaining."
+                )
 
             quality = round(random.uniform(0.5, 1), 6)
-            reward, remaining_total, next_max_reward, hexID2 = rewardFn.calculate_reward(fixed_x2, fixed_y2, quality)
+            reward, remaining_total, next_max_reward, hexID2 = rewardFn.calculate_reward(
+                fixed_x2, fixed_y2, quality)
             reward_sum2 += reward
             if i in print_at:
-                print(f"Reward for {hexID2} at {i}th iter: {reward} at quality={quality} with {remaining_total} remaining.")
+                print(
+                    f"Reward for {hexID2} at {i}th iter: {reward} at quality={quality} with {remaining_total} remaining."
+                )
 
-            if i in print_at :
-                print(f"=== Cummulative reward after {i} is {reward_sum1} and {reward_sum2} for {hexID1} and {hexID2} resp. ===")
-        print(f"=== Cummulative reward after {max_iters} is {reward_sum1} and {reward_sum2} for {hexID1} and {hexID2} resp. ===")
+            if i in print_at:
+                print(
+                    f"=== Cummulative reward after {i} is {reward_sum1} and {reward_sum2} for {hexID1} and {hexID2} resp. ==="
+                )
+        print(
+            f"=== Cummulative reward after {max_iters} is {reward_sum1} and {reward_sum2} for {hexID1} and {hexID2} resp. ==="
+        )
 
     fixed_y = None
     fixed_x = 10.0
     fixed_y1, fixed_y2 = 10.0, 10.00036
     fixed_reso1, fixed_reso2 = 9, 10
-    assert h3.geo_to_h3(fixed_x, fixed_y1, fixed_reso1) == h3.geo_to_h3(fixed_x, fixed_y2, fixed_reso1)
-    assert h3.geo_to_h3(fixed_x, fixed_y1, fixed_reso2) != h3.geo_to_h3(fixed_x, fixed_y2, fixed_reso2)
+    assert h3.geo_to_h3(fixed_x, fixed_y1,
+                        fixed_reso1) == h3.geo_to_h3(fixed_x, fixed_y2,
+                                                     fixed_reso1)
+    assert h3.geo_to_h3(fixed_x, fixed_y1, fixed_reso2) != h3.geo_to_h3(
+        fixed_x, fixed_y2, fixed_reso2)
 
-    twoLvlReward = rewardMultiLevel()
+    twoLvlReward = RewardMultiLevel()
     twoLvlReward.__add_resolution_rewards__(fixed_reso1, 10, 0.5)
     twoLvlReward.__add_resolution_rewards__(fixed_reso2, 10, 1)
 
-    print("\n\n\n=============================================================")
+    print(
+        "\n\n\n=============================================================")
     print("==== Runs for 2 lvl Resolution with Quality ~ U[0.5, 1]: ====")
     print("=============================================================")
     print_at = [0, 1, 2, 3, 4, 5, 10, 20, 100, 500]
@@ -197,20 +234,30 @@ if __name__ == "__main__":
     reward_sum1 = 0
     reward_sum2 = 0
 
-    max_iters = 1000 # Assume 1000 images for now.
+    max_iters = 1000  # Assume 1000 images for now.
     for i in range(max_iters):
         quality = round(random.uniform(0.5, 1), 6)
-        reward = twoLvlReward.compute_multilevel_rewards(fixed_x, fixed_y1, quality)
+        reward = twoLvlReward.compute_multilevel_rewards(
+            fixed_x, fixed_y1, quality)
         reward_sum1 += reward
         if i in print_at:
-            print(f"Reward for {(fixed_x, fixed_y1)} at {i}th iter: {reward} at quality={quality}.")
+            print(
+                f"Reward for {(fixed_x, fixed_y1)} at {i}th iter: {reward} at quality={quality}."
+            )
 
         quality = round(random.uniform(0.5, 1), 6)
-        reward = twoLvlReward.compute_multilevel_rewards(fixed_x, fixed_y2, quality)
+        reward = twoLvlReward.compute_multilevel_rewards(
+            fixed_x, fixed_y2, quality)
         reward_sum2 += reward
         if i in print_at:
-            print(f"Reward for {(fixed_x, fixed_y2)} at {i}th iter: {reward} at quality={quality}.")
+            print(
+                f"Reward for {(fixed_x, fixed_y2)} at {i}th iter: {reward} at quality={quality}."
+            )
 
-        if i in print_at :
-            print(f"=== Cummulative reward after {i} is {reward_sum1} and {reward_sum2} for {hexID1} and {hexID2} resp. ===")
-    print(f"=== Cummulative reward after {max_iters} is {reward_sum1} and {reward_sum2} for {hexID1} and {hexID2} resp. ===")
+        if i in print_at:
+            print(
+                f"=== Cummulative reward after {i} is {reward_sum1} and {reward_sum2} for {hexID1} and {hexID2} resp. ==="
+            )
+    print(
+        f"=== Cummulative reward after {max_iters} is {reward_sum1} and {reward_sum2} for {hexID1} and {hexID2} resp. ==="
+    )
