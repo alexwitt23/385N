@@ -3,11 +3,40 @@
 import b2
 import flask
 from flask import request
+from web3 import Web3
+from solcx import compile_source
+import os
 
 from src import b2_interface
 from src import image_quality
 from src import h3_interface
 
+w3 = Web3(Web3.HTTPProvider('https://polygon-mumbai.infura.io/v3/'))
+
+# The following hardcoded path, needs to be changed to
+# wherever you have downloaded openzeppelin, as solcx doesn't directly download
+compiled_sol = compile_source(open("contracts/Rewarder.sol").read(),
+                            output_values=['abi', 'bin'],
+                            import_remappings={'@openzeppelin/contracts/': '/Users/ayushk4/.solcx/openzeppelin-contracts-4.5.0/contracts/'}
+                        )
+contract_id, contract_interface = compiled_sol.popitem()
+bytecode = contract_interface['bin']
+abi = contract_interface['abi']
+
+rewarder = w3.eth.contract(address=os.environ["ADDRESS_SMART_CONTRACT"], abi=abi) # 0x9ADEA578c48E4285E2d31eF7bd81c99Fb19dAA25
+nonce = w3.eth.get_transaction_count(os.environ["ACCOUNT_ADDRESS"])
+
+reward_txn = rewarder.functions.owner().buildTransaction({'chainId': 1,
+                'gas': 700000,
+                'maxFeePerGas': w3.toWei('2', 'gwei'),
+                'maxPriorityFeePerGas': w3.toWei('1', 'gwei'),
+                'nonce': nonce,
+            })
+
+private_key = os.environ["ACCOUNT_PRIVATE_KEY"]
+signed_txn = w3.eth.account.sign_transaction(unicorn_txn, private_key=private_key)
+
+w3.eth.send_raw_transaction(signed_txn.rawTransaction)
 
 APP = flask.Flask(__name__)
 
