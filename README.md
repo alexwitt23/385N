@@ -22,4 +22,10 @@ flask run
 curl http://127.0.0.1:5000/calculate-reward?archive=test_data_living_room.tar.zst
 ```
 
+# Deploying Smart Contract
+
+`cd deployContract`
+`echo "AURORA_PRIVATE_KEY=<PRIVATE_KEY>" >> .env`
+`yarn install`
+`make deploy NETWORK=testnet_aurora`
 
