@@ -5,8 +5,8 @@ import flask
 from flask import request
 
 from src import b2_interface
-from src import image_quality
 from src import h3_interface
+from src import image_quality
 
 APP = flask.Flask(__name__)
 
@@ -20,10 +20,10 @@ def calculate_reward() -> str:
     image_folder = b2_interface.download_archive(archive_name)
 
     # Calculate image sharpness
-    # average_sharpness = image_quality.calculate_images_sharpness(image_folder / "color")
-
+    average_sharpness = image_quality.calculate_images_sharpness(image_folder)
+    
     # Find index of image given lat long
-    h3_interface.calculate_images_hexagons(image_folder / "color")
+    h3_interface.calculate_images_hexagons(image_folder)
 
     # Calculate reward
     ...

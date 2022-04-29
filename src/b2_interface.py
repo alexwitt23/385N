@@ -33,6 +33,7 @@ def _download_archive_impl(archive_name: str, save_path: pathlib.Path) -> bool:
         if not tmp_save_path.is_file():
             raise ValueError(f"{archive_name} not properly downloaded!")
 
+        save_path.mkdir(parents=True)
         subprocess.call(
             ["tar", "-I", "zstd", "-xf", tmp_save_path, "-C", save_path])
 
