@@ -1,61 +1,64 @@
 <template>
-  <NFTCard 
-    :img="card.img" 
-    :name="card.name"
-    :id="card.id"
-    :description="card.description"
-    :price="card.price"
-    :time="card.time"
-    :autor="card.autor"
-    :avatar="card.avatar"
+  <sidenav
+    :custom_class="this.$store.state.mcolor"
+    :class="[
+      this.$store.state.isTransparent,
+      this.$store.state.isRTL ? 'fixed-end' : 'fixed-start',
+    ]"
+    v-if="this.$store.state.showSidenav"
   />
+  <main
+    class="main-content position-relative max-height-vh-100 h-100 border-radius-lg"
+    :style="this.$store.state.isRTL ? 'overflow-x: hidden' : ''"
+  >
+    <!-- nav -->
+    <navbar
+      :class="[navClasses]"
+      :textWhite="this.$store.state.isAbsolute ? 'text-white opacity-8' : ''"
+      :minNav="navbarMinimize"
+      v-if="this.$store.state.showNavbar"
+    />
+    <router-view />
+    <app-footer v-show="this.$store.state.showFooter" />
+    <configurator
+      :toggle="toggleConfigurator"
+      :class="[
+        this.$store.state.showConfig ? 'show' : '',
+        this.$store.state.hideConfigButton ? 'd-none' : '',
+      ]"
+    />
+  </main>
 </template>
-
 <script>
-import NFTCard from './components/NFTCard/NFTCard.vue'
+import Sidenav from "./examples/Sidenav";
+import Configurator from "@/examples/Configurator.vue";
+import Navbar from "@/examples/Navbars/Navbar.vue";
+import AppFooter from "@/examples/Footer.vue";
+import { mapMutations } from "vuex";
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    NFTCard
+    Sidenav,
+    Configurator,
+    Navbar,
+    AppFooter,
   },
-  data: () => ({
-    card: {
-      img: 'image-equilibrium.jpg',
-      name: 'Equilibrium',
-      description: 'Our Equilibrium collection promotes balance and calm.',
-      id: 3429,
-      price: 0.041,
-      time: 3,
-      autor: 'Jules Wyvern',
-      avatar: 'image-avatar.png',
-    }
-  })
-}
+  methods: {
+    ...mapMutations(["toggleConfigurator", "navbarMinimize"]),
+  },
+  computed: {
+    navClasses() {
+      return {
+        "position-sticky blur shadow-blur mt-4 left-auto top-1 z-index-sticky": this
+          .$store.state.isNavFixed,
+        "position-absolute px-4 mx-0 w-100 z-index-2": this.$store.state
+          .isAbsolute,
+        "px-0 mx-4 mt-4": !this.$store.state.isAbsolute,
+      };
+    },
+  },
+  beforeMount() {
+    this.$store.state.isTransparent = "bg-transparent";
+  },
+};
 </script>
-
-<style lang="scss">
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
-* {
-  margin: 0;
-  box-sizing: border-box;
-}
-html {
-  font-size: 62.5%;
-}
-img {
-  width: 100%;
-  vertical-align: middle;
-}
-body {
-  background-color: #0D192C;
-  font-family: 'Outfit', sans-serif;
-}
-#app {
-  display: flex;
-  justify-content: center;
-  margin-top: 62px;
-  @media screen and (min-width: 768px) {
-      margin-top: 152px;
-  }
-}
-</style>
