@@ -3,3 +3,4 @@ opencv-python
 b2
 h3
 Pillow
+py-solc-x
