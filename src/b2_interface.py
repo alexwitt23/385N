@@ -26,10 +26,15 @@ def _download_archive_impl(archive_name: str, save_path: pathlib.Path) -> bool:
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_dir = pathlib.Path(tmp_dir)
         tmp_save_path = tmp_dir / archive_name
-        subprocess.call(["b2", "download-file-by-name", "data-upload", archive_name, tmp_save_path])
+        subprocess.call([
+            "b2", "download-file-by-name", "data-upload", archive_name,
+            tmp_save_path
+        ])
         if not tmp_save_path.is_file():
             raise ValueError(f"{archive_name} not properly downloaded!")
 
-        subprocess.call(["tar", "-I", "zstd", "-xf", tmp_save_path, "-C", save_path])
-    
+        save_path.mkdir(parents=True)
+        subprocess.call(
+            ["tar", "-I", "zstd", "-xf", tmp_save_path, "-C", save_path])
+
     return save_path

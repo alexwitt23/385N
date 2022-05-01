@@ -12,4 +12,3 @@ def calculate_images_hexagons(image_folder: pathlib.Path):
         print(image._getexif())
         for key, value in image.getexif():
             print(key, value)
-

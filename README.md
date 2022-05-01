@@ -13,13 +13,13 @@ python3 -m pip install -r requirements.txt
 
 ```
 export FLASK_APP=src/flask_api
-flask run
+PYTHONPATH=. flask run
 ```
 
 # API
 
 ```
-curl http://127.0.0.1:5000/calculate-reward?archive=test_data_living_room.tar.zst
+curl http://127.0.0.1:5000/calculate-reward?archive=rlm_20220426.tar.zst
 ```
 
 # Deploying Smart Contract

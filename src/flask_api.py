@@ -10,9 +10,8 @@ import os, json
 from extract_hexid import get_hexid_from_image
 
 from src import b2_interface
-from src import image_quality
 from src import h3_interface
-
+from src import image_quality
 
 env_variables = json.load(open('.env.json'))
 
@@ -31,19 +30,20 @@ rewarder = w3.eth.contract(address=env_variables["ADDRESS_SMART_CONTRACT"], abi=
 
 APP = flask.Flask(__name__)
 
+
 @APP.route("/calculate-reward")
 def calculate_reward() -> str:
     # Parse archive
     archive_name = request.args.get("archive", default=None, type=str)
-    
+
     # Download images from b2
     image_folder = b2_interface.download_archive(archive_name)
 
     # Calculate image sharpness
-    # average_sharpness = image_quality.calculate_images_sharpness(image_folder / "color")
-
+    average_sharpness = image_quality.calculate_images_sharpness(image_folder)
+    
     # Find index of image given lat long
-    h3_interface.calculate_images_hexagons(image_folder / "color")
+    h3_interface.calculate_images_hexagons(image_folder)
 
     hex_id = get_hexid_from_image(path)
 
@@ -70,6 +70,6 @@ def calculate_reward() -> str:
 
     return {"reward": 0}
 
+
 if __name__ == "__main__":
     APP.run(debug=True)
-
