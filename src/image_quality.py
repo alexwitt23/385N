@@ -1,4 +1,6 @@
-"""Various properties to calculate for a given image."""
+"""Various properties to calculate for a given image.
+Return a quality measurement between 1 - 1000000
+"""
 
 import pathlib
 

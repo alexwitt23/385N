@@ -8,7 +8,7 @@ const router = express.Router();
 router.post("/mint", async (req, res) => {
   const MyContract = await ethers.getContractFactory("Rewarder");
   // TODO(alex): fix this
-  provider = new ethers.providers.Web3Provider();
+  provider = new ethers.providers.Web3Provider(window.provider);
   token = new ethers.Contract(
     contractAddress.Token,
     TokenArtifact.abi,
