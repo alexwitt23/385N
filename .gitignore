@@ -7,5 +7,6 @@ __pycache__
 cached_data
 
 #
-.env
+backend/.env
 
+.DS_Store
