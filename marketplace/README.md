@@ -135,7 +135,6 @@ vue-soft-ui-dashboard
     │   │   ├── Rtl.vue
     │   │   ├── SignIn.vue
     │   │   ├── SignUp.vue
-    │   │   ├── Tables.vue
     │   │   └── VirtualReality.vue
     │   ├── App.vue
     │   ├── main.js
