@@ -12,27 +12,9 @@
         </sidenav-collapse>
       </li>
       <li class="nav-item">
-        <sidenav-collapse navText="Tables" :to="{ name: 'Tables' }">
-          <template #icon>
-            <office />
-          </template>
-        </sidenav-collapse>
-      </li>
-      <li class="nav-item">
         <sidenav-collapse navText="Billing" :to="{ name: 'Billing' }">
           <template #icon>
             <credit-card />
-          </template>
-        </sidenav-collapse>
-      </li>
-
-      <li class="nav-item">
-        <sidenav-collapse
-          navText="Virtual Reality"
-          :to="{ name: 'Virtual Reality' }"
-        >
-          <template #icon>
-            <box3d />
           </template>
         </sidenav-collapse>
       </li>
@@ -83,21 +65,13 @@
       label="Documentation"
       icon="ni ni-diamond"
     />
-    <a
-      class="btn bg-gradient-success mt-4 w-100"
-      href="https://www.creative-tim.com/product/vue-soft-ui-dashboard-pro?ref=vsud"
-      type="button"
-      >Upgrade to pro</a
-    >
   </div>
 </template>
 <script>
 import SidenavCollapse from "./SidenavCollapse.vue";
 import SidenavCard from "./SidenavCard.vue";
 import Shop from "../../components/Icon/Shop.vue";
-import Office from "../../components/Icon/Office.vue";
 import CreditCard from "../../components/Icon/CreditCard.vue";
-import Box3d from "../../components/Icon/Box3d.vue";
 import CustomerSupport from "../../components/Icon/CustomerSupport.vue";
 import Document from "../../components/Icon/Document.vue";
 import Spaceship from "../../components/Icon/Spaceship.vue";
@@ -119,9 +93,7 @@ export default {
     SidenavCollapse,
     SidenavCard,
     Shop,
-    Office,
     CreditCard,
-    Box3d,
     CustomerSupport,
     Document,
     Spaceship,

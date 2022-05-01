@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 
    
+=======
+>>>>>>> bfb5a10c3da622b96a7b7971d42409816007a474
 // We require the Hardhat Runtime Environment explicitly here. This is optional
 // but useful for running the script in a standalone fashion through `node <script>`.
 //
