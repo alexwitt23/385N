@@ -1,4 +1,9 @@
 .DS_Store
+.env.json
+
+deployContract/artifacts
+deployContract/cache
+deployContract/node_modules
 
 # Virtual environment
 .venv

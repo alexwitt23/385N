@@ -5,8 +5,6 @@ import pathlib
 from PIL import Image
 import h3
 
-
-
 def calculate_images_hexagons(image_folder: pathlib.Path):
     image_sharpnesses = {}
     for image_path in image_folder.glob("*.jpg"):

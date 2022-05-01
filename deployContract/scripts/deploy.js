@@ -15,6 +15,7 @@ async function main() {
     // await hre.run('compile');
 
     const provider = hre.ethers.provider;
+    console.log(provider)
     const deployerWallet = new hre.ethers.Wallet(process.env.AURORA_PRIVATE_KEY, provider);
 
     console.log(
@@ -33,7 +34,7 @@ async function main() {
         .deploy(10, 10000000, 1000000);
     await ourToken.deployed();
 
-    console.log("WatermelonToken deployed to:", ourToken.address);
+    console.log("Smart Contract deployed to:", ourToken.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -35,6 +35,10 @@ module.exports = {
       live: true,
       gasPrice: 50000000000,
       gasMultiplier: 2,
+    },    
+    matic: {
+      url: 'https://rpc-mumbai.maticvigil.com',
+      accounts: [`0x${AURORA_PRIVATE_KEY}`]
     },
   }
 };
