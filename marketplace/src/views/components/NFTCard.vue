@@ -32,6 +32,7 @@
       </div>
       <p class="card__autor">Creation of <span class="card__autor--alt-color">{{ autor }}</span></p>
     </div>
+    <BuyNFTButton />
   </div>
 </template>
 
@@ -45,9 +46,11 @@ import {
   Scene,
 } from 'troisjs';
 
+import BuyNFTButton from './BuyNFTButton.vue'
+
 export default {
   props: {
-    img: {
+    object: {
       type: String,
       default: '',
       required: true
@@ -85,6 +88,7 @@ export default {
     GltfModel,
     Renderer,
     Scene,
+    BuyNFTButton,
   },
 }
 </script>

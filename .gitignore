@@ -10,3 +10,11 @@ cached_data
 backend/.env
 
 .DS_Store
+
+node_modules
+
+# hard hat
+cache
+artifacts
+
+*.glb
