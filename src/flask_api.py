@@ -5,11 +5,12 @@ import h3
 from flask import request
 from web3 import Web3
 from solcx import compile_source
-import os, json
+import json
 
 from src import b2_interface
 from src import image_quality
 from src import h3_interface
+from src import file_utils
 
 
 env_variables = json.load(open('.env.json'))
@@ -34,43 +35,43 @@ def calculate_reward() -> str:
     archive_name = request.args.get("archive", default=None, type=str)
     
     # Download images from b2
-    # image_folder = b2_interface.download_archive(archive_name)
+    image_folder = b2_interface.download_archive(archive_name)
 
-    # # Calculate image sharpness
-    # # average_sharpness = image_quality.calculate_images_sharpness(image_folder / "color")
+    all_images = file_utils.find_all_images(image_folder)
+    image_names = [image.name for image in all_images]
 
+    # Calculate image sharpness
+    average_sharpness = image_quality.calculate_images_sharpness(image_folder)
     # # Find index of image given lat long
-    # h3_interface.calculate_images_hexagons(image_folder / "color")
-
-    #hex_id = get_hexid_from_image(path)
+    image_hexagons, image_exifs = h3_interface.calculate_images_hexagons(all_images)
 
     receiver_address = env_variables["ACCOUNT_ADDRESS"]
 
     # Distribute reward
-    quality = 100
-    assert 1 < quality < 100000
     nonce = w3.eth.get_transaction_count(env_variables["ACCOUNT_ADDRESS"])
 
     hex_id = "00000000000"
-    reward_txn = rewarder.functions.giveReward(receiver_address,
-                quality,
-                hex_id).buildTransaction({
-                    'gas': 1500000,
-                    'gasPrice': w3.toWei('3', 'gwei'),
-                    'from': env_variables["ACCOUNT_ADDRESS"],
-                    'nonce': nonce,
-                })
+    for hex_id, quality in zip(image_hexagons.values(), average_sharpness.values()):
+        reward_txn = rewarder.functions.giveReward(receiver_address,
+                    quality,
+                    hex_id).buildTransaction({
+                        'gas': 1500000,
+                        'gasPrice': w3.toWei('3', 'gwei'),
+                        'from': env_variables["ACCOUNT_ADDRESS"],
+                        'nonce': nonce,
+                    })
 
-    private_key = env_variables["ACCOUNT_PRIVATE_KEY"]
-    signed_txn = w3.eth.account.sign_transaction(reward_txn, private_key=private_key)
+        private_key = env_variables["ACCOUNT_PRIVATE_KEY"]
+        signed_txn = w3.eth.account.sign_transaction(reward_txn, private_key=private_key)
 
-    send = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+        send = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
 
-    return {
+    return json.dumps({
         "reward": 0,
         "transaction_id": send.hex(),
-        
-    }
+        "image_names": image_names,
+        "image_hexagons": image_hexagons,
+    })
 
 if __name__ == "__main__":
     APP.run(debug=True)
